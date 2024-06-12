@@ -6,13 +6,60 @@
     <title>Document</title>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="h-full grid place-items-center bg-gray-400 text-black">
+<style>
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 10px;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    button:hover {
+      background: #0056b3;
+    }
+    
+    .error {
+      color: red;
+    }
+    </style>
+
+<body>
     
     <div id="app"></div>
-
     <script type="module">
 
         const { ref, createApp } = Vue;
@@ -78,14 +125,14 @@
                 return { bill, owed, billOptions, changeBreakdown, errorMessage, calculateChange };
             },
             template: `
-                <section class="space-y-6" >
+                <div class="container">
                     <h1 class="font-bold mb-2">Vending Machine</h1>
                     <BillSelector v-model:bill="bill" :billOptions="billOptions" />
                     <OwedInput v-model:owed="owed" />
-                    <button class="bg-gray-200 hover:bg-gray-400 border rounded px-5 py-2" @click="calculateChange">Calculate Change</button>
+                    <button class="bg-gray-200 hover:bg-gray-400 border rounded px-5 py-2" @click="calculateChange">Change</button>
                     <ChangeBreakdown :changeBreakdown="changeBreakdown" />
                     <ErrorMessage :errorMessage="errorMessage" />
-                </section>
+                </div>
             `
         };
 
