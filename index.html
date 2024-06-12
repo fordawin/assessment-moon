@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full grid place-items-center bg-gray-400 text-black">
+    
+    <div id="app"></div>
+
+    <script type="module">
+
+        const { ref, createApp } = Vue;
+
+        import BillSelector from './components/billSelector.js';
+        import OwedInput from './components/owedInput.js';
+        import ChangeBreakdown from './components/changeBreakdown.js';
+        import ErrorMessage from './components/errorMessage.js';
+
+        const app = {
+            components: {
+                BillSelector,
+                OwedInput,
+                ChangeBreakdown,
+                ErrorMessage
+            },
+            setup() {
+                const bill = ref(0);
+                const owed = ref(0);
+                const changeBreakdown = ref({});
+                const errorMessage = ref('');
+
+                const billOptions = [5, 10, 20, 50, 100, 200, 500, 1000];
+                const denominations = [
+                    1000.00, 500.00, 200.00, 100.00, 50.00, 20.00,
+                    10.00, 5.00, 1.00, 0.25, 0.10, 0.05, 0.01
+                ];
+
+                const calculateChange = () => {
+                    errorMessage.value = '';
+                    changeBreakdown.value = {};
+
+                    if (owed.value < 0 || owed.value > 1000) {
+                        errorMessage.value = 'Owed amount must be between 0 and 1000.';
+                        return;
+                    }
+                    if (!billOptions.includes(bill.value)) {
+                        errorMessage.value = 'Please select a valid bill denomination.';
+                        return;
+                    }
+
+                    let change = bill.value - owed.value;
+                    if (change < 0) {
+                        errorMessage.value = 'The bill paid is less than the amount owed.';
+                        return;
+                    }
+
+                    const breakdown = {};
+                    denominations.forEach(denom => {
+                        if (change >= denom) {
+                            const count = Math.floor(change / denom);
+                            if (count > 0) {
+                                breakdown[denom] = count;
+                                change -= count * denom;
+                                change = Math.round(change * 100) / 100;  // Avoid floating-point issues
+                            }
+                        }
+                    });
+
+                    changeBreakdown.value = breakdown;
+                };
+
+                return { bill, owed, billOptions, changeBreakdown, errorMessage, calculateChange };
+            },
+            template: `
+                <section class="space-y-6" >
+                    <h1 class="font-bold mb-2">Vending Machine</h1>
+                    <BillSelector v-model:bill="bill" :billOptions="billOptions" />
+                    <OwedInput v-model:owed="owed" />
+                    <button class="bg-gray-200 hover:bg-gray-400 border rounded px-5 py-2" @click="calculateChange">Calculate Change</button>
+                    <ChangeBreakdown :changeBreakdown="changeBreakdown" />
+                    <ErrorMessage :errorMessage="errorMessage" />
+                </section>
+            `
+        };
+
+        createApp(app).mount('#app');
+      </script>
+
+</body>
+
+</html>
